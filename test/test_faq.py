@@ -1,17 +1,11 @@
 import pytest
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from pages.main_page import MainPage
 from locators.main_page_locators import MainPageLocators
-from conftest import *
-
+from data import *
+from constants import main_url
+import allure
 
 class TestFAQ:
-
-    @classmethod
-    def setup_class(cls):
-        cls.driver = webdriver.Chrome()
-        cls.wait = WebDriverWait(cls.driver, 10)
 
     @pytest.mark.parametrize(
         "question_locator, answer_locator, expected_text",
@@ -61,21 +55,19 @@ class TestFAQ:
             )
         ]
     )
+    @allure.title('Проверка текста вопросов и ответов')
     def test_faq_answers(
         self,
+        driver,
         question_locator,
         answer_locator,
         expected_text
     ):
-        self.driver.get(main_url)
-        page = MainPage(self.driver)
+        driver.get(main_url)
+        page = MainPage(driver)
 
         page.click_faq_question(question_locator)
 
         actual = page.get_faq_answer(answer_locator)
 
         assert expected_text == actual
-
-    @classmethod
-    def teardown_class(cls):
-        cls.driver.quit()

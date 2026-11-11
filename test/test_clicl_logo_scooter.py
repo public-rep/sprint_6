@@ -1,20 +1,10 @@
 import pytest
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from pages.main_page import MainPage
-from conftest import *
+from constants import main_url, order_url
+import allure
 
 
 class TestClickLogo:
-
-    driver = None
-    wait = None
-
-    @classmethod
-    def setup_class(cls):
-        cls.driver = webdriver.Chrome()
-        cls.wait = WebDriverWait(cls.driver, 10)
 
     @pytest.mark.parametrize(
         'url',
@@ -23,14 +13,11 @@ class TestClickLogo:
             order_url
         ]
     )
-    def test_click_logo_scooter(self, url):
-        self.driver.get(url)
-
-        page = MainPage(self.driver)
+    @allure.title('Проверка перехода на страницу самокат при нажатие на логотип')
+    def test_click_logo_scooter(self,driver, url):
+        
+        driver.get(url)
+        page = MainPage(driver)
         page.click_button_logo_scooter()
+        assert page.is_main_ya_opened(main_url)
 
-        assert self.wait.until(EC.url_to_be(main_url))
-
-    @classmethod
-    def teardown_class(cls):
-        cls.driver.quit()

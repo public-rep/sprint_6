@@ -1,53 +1,20 @@
 import pytest
-
 from datetime import datetime, timedelta
-
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
 from pages.order_page import OrderPage
 from pages.main_page import MainPage
-
-from locators.order_page_locator import OrderPageLocators
 from locators.main_page_locators import MainPageLocators
+from constants import main_url
+from data import * 
+import allure
 
-from conftest import main_url
 
 
 class TestOrderPage:
 
-    @pytest.fixture
-    def driver(self):
-        driver = webdriver.Firefox()
-        yield driver
-        driver.quit()
-
     @pytest.mark.parametrize(
         "order_data",
-        [
-            {
-                "name": "Иван",
-                "surname": "Иванов",
-                "address": "Москва, улица Ленина, 10",
-                "metro": "Сокольники",
-                "phone": "89991234567",
-                "period": "сутки",
-                "color": "black",
-                "comment": "Позвонить перед доставкой"
-            },
-            {
-                "name": "Петр",
-                "surname": "Петров",
-                "address": "Москва, улица Пушкина, 15",
-                "metro": "Аэропорт",
-                "phone": "89997654321",
-                "period": "двое суток",
-                "color": "grey",
-                "comment": "Доставить после обеда"
-            }
-        ],
-        ids=["first_user", "second_user"]
+        order_data,
+        ids=order_data_ids
     )
 
     @pytest.mark.parametrize(
@@ -58,7 +25,7 @@ class TestOrderPage:
         ],
         ids=["header_button", "bottom_button"]
     )
-
+    @allure.title('Проверка оформления заказа самоката по позитиву')
     def test_positive_order(
         self,
         driver,
@@ -73,11 +40,7 @@ class TestOrderPage:
 
         main_page.click_order_button(order_button)
 
-        WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.NAME
-            )
-        )
+
         order_page.about_user_order(
             order_data["name"],
             order_data["surname"],
@@ -88,11 +51,7 @@ class TestOrderPage:
 
         order_page.click_next_button()
 
-        WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.DELIVERY_DATE
-            )
-        )
+
 
         delivery_date = (
             datetime.now() + timedelta(days=3)
@@ -104,17 +63,8 @@ class TestOrderPage:
             order_data["period"]
         )
 
-        if order_data["color"] == "black":
-            order_page.select_black_color()
-        else:
-            order_page.select_grey_color()
-
-        order_page.enter_comment(
-            order_data["comment"]
-        )
-
         order_page.click_order_button()
         
         order_page.click_confirm_button()
 
-        assert order_page.is_success_message_visible().is_displayed()
+        assert order_page.is_success_message_visible()

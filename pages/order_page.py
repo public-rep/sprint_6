@@ -5,34 +5,31 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
+from pages.base_page import BasePage
+import allure 
+class OrderPage(BasePage):
 
-class OrderPage:
 
-    def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
-
+    @allure.step('Ввести имя')
     def enter_name(self, name):
-        self.wait.until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.NAME
-            )
-        ).send_keys(name)
-
+        self.enter_text(
+        OrderPageLocators.NAME,
+        name
+        )
+    @allure.step('Ввести фамилию')  
     def enter_surname(self, surname):
-        self.wait.until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.SURNAME
-            )
-        ).send_keys(surname)
-
+        self.enter_text(
+                OrderPageLocators.SURNAME,
+            surname)
+        
+    @allure.step('Ввести адресс')
     def enter_address(self, address):
-        self.wait.until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.ADDRESS
-            )
-        ).send_keys(address)
-
+        self.enter_text(
+            
+                OrderPageLocators.ADDRESS,
+            address)
+        
+    @allure.step('Выбрать метро')
     def enter_metro(self, metro):
         metro_input = self.wait.until(
             EC.element_to_be_clickable(
@@ -56,14 +53,14 @@ class OrderPage:
         raise AssertionError(
             f"Станция метро {metro} не найдена"
         )
-
+    
+    @allure.step('Ввести номер телефона')
     def enter_phone(self, phone):
-        self.wait.until(
-            EC.visibility_of_element_located(
-                OrderPageLocators.PHONE
+        self.enter_text( OrderPageLocators.PHONE,
+            phone
             )
-        ).send_keys(phone)
-
+      
+    @allure.step('Заполнить данные об аредаторе')
     def about_user_order(
         self, name, surname, address, metro, phone
     ):
@@ -73,13 +70,14 @@ class OrderPage:
         self.enter_metro(metro)
         self.enter_phone(phone)
 
+    @allure.step('Нажать кнопку дальше')
     def click_next_button(self):
         self.wait.until(
-            EC.element_to_be_clickable(
-                OrderPageLocators.NEXT_BUTTON
-            )
+        EC.element_to_be_clickable(
+            OrderPageLocators.NEXT_BUTTON
+        )
         ).click()
-
+    @allure.step('Ввести дату')
     def enter_delivery_date(self, date):
         date_input = self.wait.until(
             EC.visibility_of_element_located(
@@ -96,7 +94,7 @@ class OrderPage:
                 OrderPageLocators.DATEPICKER
             )
         )
-
+    @allure.step('Выбрать период аренды')
     def select_rental_period(self, period):
         dropdown = self.wait.until(
             EC.element_to_be_clickable(
@@ -125,28 +123,28 @@ class OrderPage:
         raise AssertionError(
             f"Срок аренды '{period}' не найден"
         )
-
+    @allure.step('Черный цвет самоката')
     def select_black_color(self):
         self.wait.until(
             EC.element_to_be_clickable(
                 OrderPageLocators.BLACK_COLOR
             )
         ).click()
-
+    @allure.step('Серый цвет самоката')
     def select_grey_color(self):
         self.wait.until(
             EC.element_to_be_clickable(
                 OrderPageLocators.GREY_COLOR
             )
         ).click()
-
+    @allure.step('Добавить комментарий к заказу')
     def enter_comment(self, comment):
         self.wait.until(
             EC.visibility_of_element_located(
                 OrderPageLocators.COMMENT
             )
         ).send_keys(comment)
-
+    @allure.step('Нажать кнопку заказа')
     def click_order_button(self):
         order_button = self.wait.until(EC.element_to_be_clickable(OrderPageLocators.ORDER_BUTTON))
         order_button.click()
